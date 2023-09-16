@@ -9,6 +9,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  relationMode ="prisma"
 }
 
 model Movie{
@@ -37,10 +38,11 @@ model Person{
 
 model Review{
   id Int @id @default(autoincrement())
-  rate Int
+  rating Int
   comment String @db.Text
   movie Movie @relation(fields:[movieId], references: [id])
   movieId Int
+  @@index([movieId])
 }
 
 model Award{
@@ -51,6 +53,8 @@ model Award{
   movie Movie @relation(fields:[movieId], references: [id])
   movieId Int
   personId Int
+   @@index([movieId])
+    @@index([personId])
 }
 
 model Episode{
@@ -60,4 +64,5 @@ model Episode{
   poster String
   movie Movie @relation(fields:[movieId], references: [id])
   movieId Int
+   @@index([movieId])
 }
