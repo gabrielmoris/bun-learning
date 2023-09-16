@@ -1,7 +1,24 @@
-import { Elysia } from "elysia";
+Bun.serve({
+  fetch(req) {
+    const url = new URL(req.url);
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+    const bigFile = Bun.file("./src/me.png");
+    const range = req.headers.get("Range");
+    let start = 0,
+      end = Infinity;
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+    if (range) {
+      const parts = range.split("=");
+
+      if (parts.length > 1) {
+        const ranges = parts[1].split("-");
+        if (ranges.length > 1) {
+          [start, end] = ranges.map(Number);
+        }
+      }
+    }
+
+    if (url.pathname === "/") return new Response(bigFile.slice(start, end));
+    return new Response(`404!`);
+  },
+});
